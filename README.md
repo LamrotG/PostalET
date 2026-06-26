@@ -150,14 +150,9 @@ lib/
 
 PostalEt is designed for deployment on Vercel:
 
-1. Push to GitHub
-2. Import the repository on [vercel.com](https://vercel.com)
-3. Add environment variables in the Vercel dashboard
-4. Deploy
-
 ## License
 
-[MIT](LICENSE)
+(LICENSE)
 
 ## Contributing
 
