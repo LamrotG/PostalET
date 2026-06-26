@@ -5,6 +5,7 @@ import { MapPin, ExternalLink, Calendar, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { CopyPostalCode } from "@/components/copy-postal-code";
 import { SourceAttribution } from "@/components/source-attribution";
+import { isGenericSourceUrl, getDirectoryUrl } from "@/lib/sources";
 import {
   getPlaceBySlug,
   getRelatedPlaces,
@@ -52,7 +53,7 @@ export default async function PlacePage({ params }: Props) {
   const resolved = resolvePostalCode(place.postal_code_claims);
   const relatedPlaces = await getRelatedPlaces(place);
 
-  const BASE_URL = "https://postalet.vercel.app";
+  const BASE_URL = "https://postal-et.vercel.app";
 
   const breadcrumbLd = {
     "@context": "https://schema.org",
@@ -204,7 +205,7 @@ export default async function PlacePage({ params }: Props) {
                   </div>
                 </div>
                 <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                  {claim.source_url && (
+                  {claim.source_url && !isGenericSourceUrl(claim.source_url) && (
                     <a
                       href={claim.source_url}
                       target="_blank"
@@ -214,6 +215,22 @@ export default async function PlacePage({ params }: Props) {
                       <ExternalLink className="size-3" />
                       View source
                     </a>
+                  )}
+                  {claim.source_url && isGenericSourceUrl(claim.source_url) && (
+                    <a
+                      href={getDirectoryUrl(claim.source_url)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 hover:text-foreground"
+                    >
+                      <ExternalLink className="size-3" />
+                      View source directory
+                    </a>
+                  )}
+                  {!claim.source_url && (
+                    <span className="inline-flex items-center gap-1 text-muted-foreground/60">
+                      Direct link not available for this location
+                    </span>
                   )}
                   {claim.verified_at && (
                     <span className="inline-flex items-center gap-1">

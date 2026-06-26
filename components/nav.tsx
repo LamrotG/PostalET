@@ -4,25 +4,8 @@ export function Nav() {
   return (
     <header className="border-b border-border">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-        <Link
-          href="/"
-          className="flex items-center gap-1.5"
-          aria-label="PostalEt home"
-        >
-          <svg
-            width="46"
-            height="23"
-            viewBox="0 0 92 46"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-            className="text-foreground"
-          >
-            <path
-              d="M-2.6226e-05 44.7998V-0.000198364H14.592C17.4933-0.000198364 20.0533 0.597135 22.272 1.7918C24.5333 2.98647 26.2826 4.65047 27.52 6.7838C28.8 8.91714 29.44 11.3918 29.44 14.2078C29.44 16.9385 28.864 19.3705 27.712 21.5038C26.56 23.6371 24.9813 25.3225 22.976 26.5598C20.9706 27.7545 18.6453 28.3518 16 28.3518H5.43997V44.7998H-2.6226e-05ZM5.43997 23.4238H16C18.3466 23.4238 20.2666 22.5705 21.76 20.8638C23.296 19.1145 24.064 16.8958 24.064 14.2078C24.064 11.4345 23.168 9.19447 21.376 7.4878C19.584 5.78114 17.3013 4.9278 14.528 4.9278H5.43997V23.4238ZM37.0625 44.7998V-0.000198364H63.5585V4.9278H42.5025V19.3918H61.7025V24.2558H42.5025V39.8718H63.6865V44.7998H37.0625ZM85.4975 45.5678C82.3828 45.5678 79.9721 44.7571 78.2655 43.1358C76.5588 41.5145 75.7055 39.2318 75.7055 36.2878V17.3438H70.1375V12.7998H75.7055V2.8158H80.8255V12.7998H90.4255V17.3438H80.8255V35.7758C80.8255 37.3971 81.2521 38.6558 82.1055 39.5518C83.0015 40.4051 84.2388 40.8318 85.8175 40.8318C86.3295 40.8318 86.8201 40.7678 87.2895 40.6398C87.8015 40.4691 88.4628 40.0851 89.2735 39.4878L91.2575 43.6478C90.1481 44.3731 89.1455 44.8638 88.2495 45.1198C87.3535 45.4185 86.4361 45.5678 85.4975 45.5678Z"
-              fill="currentColor"
-            />
-          </svg>
+        <Link href="/" className="text-[1.125rem] font-semibold tracking-tight">
+          Postal<span className="text-muted-foreground">Et</span>
         </Link>
         <nav className="flex items-center gap-6 text-sm text-muted-foreground">
           <Link href="/" className="transition-colors hover:text-foreground">

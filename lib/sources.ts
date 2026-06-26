@@ -47,3 +47,30 @@ export const UPU_SOURCE = {
   description:
     "Ethiopian postal addressing format guide, defining the 4-digit postal code structure.",
 };
+
+const GENERIC_SOURCE_URLS = [
+  "https://en.youbianku.com/Ethiopia",
+  "https://eth.youbianku.com/Ethiopia",
+  "https://www.scribd.com/document/577572522/ET-Postcodes-Sep19-v1-230919",
+  "https://techhabesha.com/ethiopian-postal-code-zip-code/",
+  "https://eth.postcodebase.com/",
+  "https://eth.postcodebase.com",
+];
+
+export function isGenericSourceUrl(url: string): boolean {
+  const normalized = url.replace(/\/+$/, "");
+  return GENERIC_SOURCE_URLS.some(
+    (generic) => normalized === generic.replace(/\/+$/, ""),
+  );
+}
+
+export function getDirectoryUrl(url: string): string {
+  const normalized = url.replace(/\/+$/, "");
+  if (
+    normalized === "https://en.youbianku.com/Ethiopia" ||
+    normalized === "https://eth.youbianku.com/Ethiopia"
+  ) {
+    return `${normalized}#Ethiopia_Postcode_List`;
+  }
+  return url;
+}

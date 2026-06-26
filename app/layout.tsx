@@ -4,7 +4,7 @@ import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import "./globals.css";
 
-const BASE_URL = "https://postalet.vercel.app";
+const BASE_URL = "https://postal-et.vercel.app";
 
 const figtree = Figtree({
   variable: "--font-sans",
@@ -57,6 +57,9 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+  },
+  icons: {
+    icon: "/favicon.svg",
   },
   alternates: {
     canonical: BASE_URL,

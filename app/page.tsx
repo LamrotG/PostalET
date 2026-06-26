@@ -7,7 +7,7 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "PostalEt",
-  url: "https://postalet.vercel.app",
+  url: "https://postal-et.vercel.app",
   description:
     "The most transparent Ethiopian postal code directory. Search verified postal codes with source attribution and confidence ratings.",
   potentialAction: {
@@ -15,7 +15,7 @@ const jsonLd = {
     target: {
       "@type": "EntryPoint",
       urlTemplate:
-        "https://postalet.vercel.app/api/search?q={search_term_string}",
+        "https://postal-et.vercel.app/api/search?q={search_term_string}",
     },
     "query-input": "required name=search_term_string",
   },
