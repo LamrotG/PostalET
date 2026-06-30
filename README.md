@@ -58,63 +58,10 @@ The supporting references contain information that is largely consistent with th
 
 ## APIs & Services
 
-| Service | Usage |
-|---|---|
-| Supabase | PostgreSQL database for places and postal code claims |
+- Supabase - PostgreSQL database for places and postal code claims 
 
-## Local Development
 
-### Prerequisites
 
-- Node.js 18+
-- npm
-
-### Setup
-
-```bash
-git clone https://github.com/your-username/postalet.git
-cd postalet
-npm install
-```
-
-### Configure Environment
-
-Copy the example environment file and fill in your Supabase credentials:
-
-```bash
-cp .env.example .env.local
-```
-
-Edit `.env.local` with your values:
-
-```
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-```
-
-### Run
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000).
-
-### Build
-
-```bash
-npm run build
-npm start
-```
-
-## Environment Variables
-
-| Variable | Description |
-|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous (public) API key |
-
-Both variables are prefixed with `NEXT_PUBLIC_` because they are used client-side for search queries. The Supabase anon key is safe to expose — it is scoped by Row Level Security policies configured in the database.
 
 ## Folder Structure
 
@@ -146,22 +93,7 @@ lib/
   utils.ts         Utility functions
 ```
 
-## Deployment
 
-PostalEt is designed for deployment on Vercel:
 
-## License
 
-(LICENSE)
 
-## Contributing
-
-Contributions are welcome. Please:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/improvement`)
-3. Make your changes
-4. Ensure the build passes (`npm run build`)
-5. Submit a pull request
-
-For bug reports or feature requests, open an issue.
