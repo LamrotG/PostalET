@@ -32,7 +32,7 @@ export function Nav() {
             type="button"
             onClick={() => setLang(lang === "en" ? "am" : "en")}
             aria-label={lang === "en" ? "Switch to Amharic" : "Switch to English"}
-            className="rounded-md border border-border px-2 py-1 text-xs font-medium transition-colors hover:border-foreground/40 hover:text-foreground"
+            className="rounded-md border border-border px-3 py-1.5 text-sm font-semibold text-foreground transition-colors hover:border-foreground/40 hover:bg-muted"
           >
             {lang === "en" ? "አማ" : "En"}
           </button>

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Search as SearchIcon, MapPin, X } from "lucide-react";
 import type { Place } from "@/lib/types";
+import { useLanguage } from "@/lib/language-context";
 
 type SearchState = "idle" | "typing" | "loading" | "results" | "no-results";
 
@@ -16,6 +17,7 @@ export function Search() {
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const { lang } = useLanguage();
 
   const isDropdownVisible =
     hasFocus &&
@@ -35,7 +37,7 @@ export function Search() {
     setSearchState("loading");
     try {
       const res = await fetch(
-        `/api/search?q=${encodeURIComponent(trimmed)}`,
+        `/api/search?q=${encodeURIComponent(trimmed)}&lang=${lang}`,
       );
       const data: Place[] = await res.json();
       setResults(data);
@@ -44,7 +46,7 @@ export function Search() {
       setResults([]);
       setSearchState("no-results");
     }
-  }, []);
+  }, [lang]);
 
   useEffect(() => {
     if (query.trim().length < 2) return;
@@ -101,10 +103,16 @@ export function Search() {
     }
   }
 
+  function displayName(place: Place): string {
+    return (lang === "am" && place.name_am) || place.name;
+  }
+
   function formatSubtitle(place: Place): string {
+    const zone = (lang === "am" && place.zone_am) || place.zone;
+    const region = (lang === "am" && place.region_am) || place.region;
     const parts: string[] = [];
-    if (place.zone) parts.push(place.zone);
-    parts.push(place.region);
+    if (zone) parts.push(zone);
+    parts.push(region);
     return parts.join(", ");
   }
 
@@ -216,7 +224,7 @@ export function Search() {
                     <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline justify-between gap-2">
-                        <span className="font-medium">{place.name}</span>
+                        <span className="font-medium">{displayName(place)}</span>
                         <span className="shrink-0 text-xs text-muted-foreground capitalize">
                           {place.place_type}
                         </span>

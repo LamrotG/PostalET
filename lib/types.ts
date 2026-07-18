@@ -11,6 +11,16 @@ export interface Place {
   search_text: string;
   latitude: number | null;
   longitude: number | null;
+  name_am: string | null;
+  full_name_am: string | null;
+  region_am: string | null;
+  zone_am: string | null;
+  search_text_am: string | null;
+}
+
+export interface RegionInfo {
+  region: string;
+  region_am: string | null;
 }
 
 export interface PostalCodeClaim {

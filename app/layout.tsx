@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Figtree, Geist_Mono } from "next/font/google";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
+import { LanguageProvider } from "@/lib/language-context";
 import "./globals.css";
 
 const BASE_URL = "https://postal-et.vercel.app";
@@ -77,9 +78,11 @@ export default function RootLayout({
       className={`${figtree.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <Nav />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <LanguageProvider>
+          <Nav />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </LanguageProvider>
       </body>
     </html>
   );

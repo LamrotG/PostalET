@@ -2,6 +2,7 @@ import { Search } from "@/components/search";
 import { PopularPlaces } from "@/components/popular-places";
 import { Directory } from "@/components/directory";
 import { getPopularPlaces, getRegions } from "@/lib/data";
+import { getServerLanguage } from "@/lib/language-server";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -22,9 +23,10 @@ const jsonLd = {
 };
 
 export default async function Home() {
-  const [popularPlaces, regions] = await Promise.all([
+  const [popularPlaces, regions, lang] = await Promise.all([
     getPopularPlaces(),
     getRegions(),
+    getServerLanguage(),
   ]);
 
   return (
@@ -46,8 +48,8 @@ export default async function Home() {
         </section>
 
         <div className="space-y-12 pb-16">
-          <PopularPlaces places={popularPlaces} />
-          <Directory regions={regions} />
+          <PopularPlaces places={popularPlaces} lang={lang} />
+          <Directory regions={regions} lang={lang} />
         </div>
       </div>
     </>

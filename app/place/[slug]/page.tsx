@@ -12,6 +12,8 @@ import {
   resolvePostalCode,
   getConfidenceLabel,
 } from "@/lib/data";
+import { getServerLanguage } from "@/lib/language-server";
+import { localizePlace } from "@/lib/localize";
 import type { ConfidenceLevel } from "@/lib/types";
 
 type Props = {
@@ -51,7 +53,11 @@ export default async function PlacePage({ params }: Props) {
   if (!place) notFound();
 
   const resolved = resolvePostalCode(place.postal_code_claims);
-  const relatedPlaces = await getRelatedPlaces(place);
+  const [relatedPlaces, lang] = await Promise.all([
+    getRelatedPlaces(place),
+    getServerLanguage(),
+  ]);
+  const localized = localizePlace(place, lang);
 
   const BASE_URL = "https://postal-et.vercel.app";
 
@@ -111,23 +117,23 @@ export default async function PlacePage({ params }: Props) {
           href={`/directory/${encodeURIComponent(place.region)}`}
           className="hover:text-foreground"
         >
-          {place.region}
+          {localized.region}
         </Link>
         <span className="mx-2">/</span>
-        <span className="text-foreground">{place.name}</span>
+        <span className="text-foreground">{localized.name}</span>
       </nav>
 
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-semibold tracking-tight">
-            {place.name}
+            {localized.name}
           </h1>
           <Badge variant="secondary" className="capitalize">
             {place.place_type}
           </Badge>
         </div>
-        <p className="mt-1 text-muted-foreground">{place.full_name}</p>
+        <p className="mt-1 text-muted-foreground">{localized.full_name}</p>
       </div>
 
       {/* Postal Code Card */}
@@ -166,8 +172,8 @@ export default async function PlacePage({ params }: Props) {
 
       {/* Place Details */}
       <div className="mb-8 grid gap-4 sm:grid-cols-2">
-        <DetailRow label="Region" value={place.region} />
-        {place.zone && <DetailRow label="Zone" value={place.zone} />}
+        <DetailRow label="Region" value={localized.region} />
+        {localized.zone && <DetailRow label="Zone" value={localized.zone} />}
         <DetailRow label="Type" value={place.place_type} />
         <DetailRow
           label="Sources"
@@ -261,7 +267,7 @@ export default async function PlacePage({ params }: Props) {
           <div className="rounded-lg border border-dashed border-border p-6">
             <h2 className="font-semibold">Postal code unavailable</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              We found the location &ldquo;{place.full_name}&rdquo;, but we
+              We found the location &ldquo;{localized.full_name}&rdquo;, but we
               don&apos;t currently have a verified postal code available for it.
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
@@ -311,26 +317,29 @@ export default async function PlacePage({ params }: Props) {
       {relatedPlaces.length > 0 && (
         <section>
           <h2 className="mb-4 text-lg font-semibold">
-            Other places in {place.region}
+            Other places in {localized.region}
           </h2>
           <div className="grid gap-2 sm:grid-cols-2">
-            {relatedPlaces.map((related) => (
-              <Link
-                key={related.id}
-                href={`/place/${related.slug}`}
-                className="group flex items-center gap-2 rounded-lg border border-border px-4 py-3 transition-colors hover:bg-muted/50"
-              >
-                <MapPin className="size-4 text-muted-foreground" />
-                <div className="min-w-0">
-                  <span className="font-medium">{related.name}</span>
-                  {related.zone && (
-                    <span className="ml-2 text-sm text-muted-foreground">
-                      {related.zone}
-                    </span>
-                  )}
-                </div>
-              </Link>
-            ))}
+            {relatedPlaces.map((related) => {
+              const localizedRelated = localizePlace(related, lang);
+              return (
+                <Link
+                  key={related.id}
+                  href={`/place/${related.slug}`}
+                  className="group flex items-center gap-2 rounded-lg border border-border px-4 py-3 transition-colors hover:bg-muted/50"
+                >
+                  <MapPin className="size-4 text-muted-foreground" />
+                  <div className="min-w-0">
+                    <span className="font-medium">{localizedRelated.name}</span>
+                    {localizedRelated.zone && (
+                      <span className="ml-2 text-sm text-muted-foreground">
+                        {localizedRelated.zone}
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </section>
       )}

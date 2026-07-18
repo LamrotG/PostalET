@@ -5,9 +5,13 @@ import type {
   PostalCodeClaim,
   ResolvedPostalCode,
   ConfidenceLevel,
+  RegionInfo,
 } from "@/lib/types";
 
-export async function searchPlaces(query: string): Promise<Place[]> {
+export async function searchPlaces(
+  query: string,
+  lang: "en" | "am" = "en",
+): Promise<Place[]> {
   const trimmed = query.trim().toLowerCase();
   if (!trimmed) return [];
 
@@ -32,10 +36,11 @@ export async function searchPlaces(query: string): Promise<Place[]> {
     return places ?? [];
   }
 
+  const searchColumn = lang === "am" ? "search_text_am" : "search_text";
   const { data } = await supabase
     .from("places")
     .select("*")
-    .ilike("search_text", `%${trimmed}%`)
+    .ilike(searchColumn, `%${trimmed}%`)
     .order("name")
     .limit(20);
 
@@ -101,15 +106,22 @@ export async function getPlacesByRegion(region: string): Promise<Place[]> {
   return data ?? [];
 }
 
-export async function getRegions(): Promise<string[]> {
+export async function getRegions(): Promise<RegionInfo[]> {
   const { data } = await supabase
     .from("places")
-    .select("region")
+    .select("region, region_am")
     .order("region");
 
   if (!data) return [];
 
-  return [...new Set(data.map((row) => row.region))];
+  const seen = new Map<string, RegionInfo>();
+  for (const row of data) {
+    if (!seen.has(row.region)) {
+      seen.set(row.region, { region: row.region, region_am: row.region_am });
+    }
+  }
+
+  return [...seen.values()];
 }
 
 export async function getRelatedPlaces(place: Place): Promise<Place[]> {
