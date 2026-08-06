@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { getPlacesByRegion, getRegions } from "@/lib/data";
+import { PopularPlaceCode } from "@/components/popular-place-code";
+import { getPlacesByRegion, getRegions, resolvePostalCode } from "@/lib/data";
 import { getServerLanguage } from "@/lib/language-server";
 import { localizePlace, localizeRegionName } from "@/lib/localize";
 
@@ -60,9 +61,10 @@ export default async function RegionPage({ params }: Props) {
         region.
       </p>
 
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {places.map((place) => {
           const localized = localizePlace(place, lang);
+          const resolved = resolvePostalCode(place.postal_code_claims);
           return (
             <Link
               key={place.id}
@@ -70,17 +72,26 @@ export default async function RegionPage({ params }: Props) {
               className="group flex items-start gap-3 rounded-lg border border-border p-4 transition-colors hover:bg-muted/50"
             >
               <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">{localized.name}</span>
-                  <Badge variant="secondary" className="capitalize">
-                    {place.place_type}
-                  </Badge>
+              <div className="flex min-w-0 flex-1 items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium group-hover:text-foreground">
+                      {localized.name}
+                    </span>
+                    {place.place_type !== "Locality" && (
+                      <Badge variant="secondary" className="capitalize">
+                        {place.place_type}
+                      </Badge>
+                    )}
+                  </div>
+                  {localized.zone && (
+                    <p className="mt-0.5 truncate text-sm text-muted-foreground">
+                      {localized.zone}
+                    </p>
+                  )}
                 </div>
-                {localized.zone && (
-                  <p className="mt-0.5 truncate text-sm text-muted-foreground">
-                    {localized.zone}
-                  </p>
+                {resolved.postal_code && (
+                  <PopularPlaceCode code={resolved.postal_code} />
                 )}
               </div>
             </Link>

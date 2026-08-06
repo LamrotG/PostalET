@@ -16,11 +16,42 @@ export default function AboutPage() {
         About PostalEt
       </h1>
       <p className="mt-2 text-muted-foreground">
-        A transparency-first Ethiopian postal code directory. We always show
-        where data comes from, how confident we are, and what is unknown.
+        PostalEt is a transparency-first directory for Ethiopian postal codes.
+      </p>
+      <p className="mt-3 text-muted-foreground">
+        Finding a postal code in Ethiopia can be surprisingly difficult.
+        Information is scattered across different websites, sources often
+        disagree, and it's rarely clear where a postal code actually came
+        from.
+      </p>
+      <p className="mt-3 text-muted-foreground">
+        PostalEt brings that information together in one place. Every postal
+        code is backed by its sources, a confidence level, and verification
+        details so you can understand not just the answer, but how trustworthy
+        it is.
       </p>
 
       <div className="mt-10 space-y-10">
+        {/* Why PostalEt exists */}
+        <Section
+          icon={<Info className="size-5" />}
+          title="Why PostalEt Exists"
+        >
+          <p>
+            PostalEt started with a simple frustration.
+          </p>
+          <p className="mt-3">
+            While working on freelance projects and filling out online forms,
+            we needed an Ethiopian postal code, but finding one wasn't as
+            simple as it should have been. Information was scattered, sources
+            often disagreed, and it was difficult to know what to trust.
+          </p>
+          <p className="mt-3">
+            So we built PostalEt: a place where Ethiopian postal code
+            information is easy to find, transparent, and backed by its
+            sources.
+          </p>
+        </Section>
         {/* What are Ethiopian postal codes */}
         <Section
           icon={<BookOpen className="size-5" />}
@@ -365,6 +396,22 @@ export default function AboutPage() {
               Postal Service directly.
             </li>
           </ul>
+        </Section>
+
+        {/* Our Mission */}
+        <Section
+          icon={<ShieldCheck className="size-5" />}
+          title="Our Mission"
+        >
+          <p>
+            Our mission is to make Ethiopian postal code information open,
+            transparent, and trustworthy.
+          </p>
+          <p className="mt-3">
+            We believe it's better to say &ldquo;we don't know&rdquo;
+            than to publish information we can't verify. Every improvement
+            we make to PostalEt follows that principle.
+          </p>
         </Section>
 
         <div className="border-t border-border pt-8 text-center">

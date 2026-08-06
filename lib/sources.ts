@@ -7,15 +7,22 @@ export interface DataSource {
 }
 
 export const PRIMARY_SOURCE: DataSource = {
-  name: "Youbianku Ethiopia Postal Codes",
-  shortName: "Youbianku",
-  url: "https://en.youbianku.com/Ethiopia",
-  description:
-    "Comprehensive Ethiopian postal code directory organized by region, zone, and locality.",
+  name: "eth.postcodebase.com",
+  shortName: "PostcodeBase",
+  url: "https://eth.postcodebase.com/",
+  description: "Searchable Ethiopian postal code database.",
   tier: "primary",
 };
 
 export const SUPPORTING_SOURCES: DataSource[] = [
+  {
+    name: "Youbianku Ethiopia Postal Codes",
+    shortName: "Youbianku",
+    url: "https://en.youbianku.com/Ethiopia",
+    description:
+      "Comprehensive Ethiopian postal code directory organized by region, zone, and locality.",
+    tier: "supporting",
+  },
   {
     name: "Ethiopian Postal Codes (September 2019)",
     shortName: "ET Postcodes Doc",
@@ -29,13 +36,6 @@ export const SUPPORTING_SOURCES: DataSource[] = [
     shortName: "TechHabesha",
     url: "https://techhabesha.com/ethiopian-postal-code-zip-code/",
     description: "Ethiopian postal code reference guide.",
-    tier: "supporting",
-  },
-  {
-    name: "PostcodeBase Ethiopia",
-    shortName: "PostcodeBase",
-    url: "https://eth.postcodebase.com/",
-    description: "Searchable Ethiopian postal code database.",
     tier: "supporting",
   },
 ];

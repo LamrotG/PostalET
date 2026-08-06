@@ -225,9 +225,11 @@ export function Search() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline justify-between gap-2">
                         <span className="font-medium">{displayName(place)}</span>
-                        <span className="shrink-0 text-xs text-muted-foreground capitalize">
-                          {place.place_type}
-                        </span>
+                        {place.place_type !== "Locality" && (
+                          <span className="shrink-0 text-xs text-muted-foreground capitalize">
+                            {place.place_type}
+                          </span>
+                        )}
                       </div>
                       <p className="mt-0.5 truncate text-sm text-muted-foreground">
                         {formatSubtitle(place)}

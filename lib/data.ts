@@ -83,27 +83,69 @@ const POPULAR_PLACE_NAMES = [
   "Harar",
   "Debre Birhan",
   "Shashamane",
+  "Adigrat",
+  "Adwa",
 ];
 
-export async function getPopularPlaces(): Promise<Place[]> {
-  const { data } = await supabase
+export async function getPopularPlaces(): Promise<PlaceWithClaims[]> {
+  const { data: places } = await supabase
     .from("places")
     .select("*")
     .in("name", POPULAR_PLACE_NAMES)
     .order("name")
-    .limit(12);
+    .limit(14);
 
-  return data ?? [];
+  if (!places || places.length === 0) return [];
+
+  const placeIds = places.map((p) => p.id);
+  const { data: claims } = await supabase
+    .from("postal_code_claims")
+    .select("*")
+    .in("place_id", placeIds)
+    .order("source_tier");
+
+  const claimsByPlace = new Map<string, PostalCodeClaim[]>();
+  for (const claim of claims ?? []) {
+    const list = claimsByPlace.get(claim.place_id) ?? [];
+    list.push(claim);
+    claimsByPlace.set(claim.place_id, list);
+  }
+
+  return places.map((place) => ({
+    ...place,
+    postal_code_claims: claimsByPlace.get(place.id) ?? [],
+  }));
 }
 
-export async function getPlacesByRegion(region: string): Promise<Place[]> {
-  const { data } = await supabase
+export async function getPlacesByRegion(
+  region: string,
+): Promise<PlaceWithClaims[]> {
+  const { data: places } = await supabase
     .from("places")
     .select("*")
     .eq("region", region)
     .order("name");
 
-  return data ?? [];
+  if (!places || places.length === 0) return [];
+
+  const placeIds = places.map((p) => p.id);
+  const { data: claims } = await supabase
+    .from("postal_code_claims")
+    .select("*")
+    .in("place_id", placeIds)
+    .order("source_tier");
+
+  const claimsByPlace = new Map<string, PostalCodeClaim[]>();
+  for (const claim of claims ?? []) {
+    const list = claimsByPlace.get(claim.place_id) ?? [];
+    list.push(claim);
+    claimsByPlace.set(claim.place_id, list);
+  }
+
+  return places.map((place) => ({
+    ...place,
+    postal_code_claims: claimsByPlace.get(place.id) ?? [],
+  }));
 }
 
 export async function getRegions(): Promise<RegionInfo[]> {
