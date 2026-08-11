@@ -21,7 +21,7 @@ export default function AboutPage() {
       <p className="mt-3 text-muted-foreground">
         Finding a postal code in Ethiopia can be surprisingly difficult.
         Information is scattered across different websites, sources often
-        disagree, and it's rarely clear where a postal code actually came
+        disagree, and it is rarely clear where a postal code actually came
         from.
       </p>
       <p className="mt-3 text-muted-foreground">
@@ -42,7 +42,7 @@ export default function AboutPage() {
           </p>
           <p className="mt-3">
             While working on freelance projects and filling out online forms,
-            we needed an Ethiopian postal code, but finding one wasn't as
+            we needed an Ethiopian postal code, but finding one wasn&apos;t as
             simple as it should have been. Information was scattered, sources
             often disagreed, and it was difficult to know what to trust.
           </p>
@@ -124,7 +124,7 @@ export default function AboutPage() {
         {/* Why some locations don't have postal codes */}
         <Section
           icon={<HelpCircle className="size-5" />}
-          title="Why don't some locations have a postal code?"
+          title="Why don&apos;t some locations have a postal code?"
         >
           <p>
             There are several reasons why a postal code might not be available
@@ -408,8 +408,8 @@ export default function AboutPage() {
             transparent, and trustworthy.
           </p>
           <p className="mt-3">
-            We believe it's better to say &ldquo;we don't know&rdquo;
-            than to publish information we can't verify. Every improvement
+            We believe it is better to say &ldquo;we do not know&rdquo;
+            than to publish information we can&apos;t verify. Every improvement
             we make to PostalEt follows that principle.
           </p>
         </Section>

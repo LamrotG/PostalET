@@ -3,6 +3,7 @@ import { PopularPlaces } from "@/components/popular-places";
 import { Directory } from "@/components/directory";
 import { getPopularPlaces, getRegions } from "@/lib/data";
 import { getServerLanguage } from "@/lib/language-server";
+import { t } from "@/lib/i18n";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -22,11 +23,11 @@ const jsonLd = {
   },
 };
 
-export default async function Home() {
-  const [popularPlaces, regions, lang] = await Promise.all([
-    getPopularPlaces(),
-    getRegions(),
-    getServerLanguage(),
+export default async function Home({ params }: { params?: Promise<{ lang?: string }> }) {
+  const lang = await getServerLanguage((await params)?.lang);
+  const [popularPlaces, regions] = await Promise.all([
+    getPopularPlaces(lang),
+    getRegions(lang),
   ]);
 
   return (
@@ -38,11 +39,10 @@ export default async function Home() {
       <div className="mx-auto w-full max-w-5xl px-4">
         <section className="flex flex-col items-center gap-4 py-16 text-center">
           <h1 className="text-3xl font-semibold tracking-tight">
-            Find Ethiopian Postal Codes
+            {t("home_title", lang)}
           </h1>
           <p className="max-w-md text-muted-foreground">
-            Search by place name, city, zone, region, or postal code. Every
-            result shows where the data comes from.
+            {t("home_description", lang)}
           </p>
           <Search />
         </section>

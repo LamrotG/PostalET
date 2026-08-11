@@ -7,15 +7,16 @@ import { PopularPlaceCode } from "@/components/popular-place-code";
 import { getPlacesByRegion, getRegions, resolvePostalCode } from "@/lib/data";
 import { getServerLanguage } from "@/lib/language-server";
 import { localizePlace, localizeRegionName } from "@/lib/localize";
+import { localePath } from "@/lib/locale";
+import { t } from "@/lib/i18n";
 
 type Props = {
-  params: Promise<{ region: string }>;
+  params: Promise<{ region: string; lang?: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { region } = await params;
   const decoded = decodeURIComponent(region);
-
   return {
     title: `${decoded} — Places & Postal Codes`,
     description: `Browse all places and postal codes in ${decoded}, Ethiopia. Find verified postal codes with source information.`,
@@ -23,17 +24,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function RegionPage({ params }: Props) {
-  const { region } = await params;
+  const { region, lang: langParam } = await params;
   const decoded = decodeURIComponent(region);
 
-  const [regions, lang] = await Promise.all([
-    getRegions(),
-    getServerLanguage(),
-  ]);
+  const lang = await getServerLanguage(langParam);
+  const regions = await getRegions(lang);
   const regionInfo = regions.find((r) => r.region === decoded);
   if (!regionInfo) notFound();
 
-  const places = await getPlacesByRegion(decoded);
+  const places = await getPlacesByRegion(decoded, lang);
   const regionLabel = localizeRegionName(
     regionInfo.region,
     regionInfo.region_am,
@@ -44,12 +43,12 @@ export default async function RegionPage({ params }: Props) {
     <div className="mx-auto w-full max-w-5xl px-4 py-10">
       {/* Breadcrumb */}
       <nav className="mb-6 text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-foreground">
-          Home
+        <Link href={localePath("/", lang)} className="hover:text-foreground">
+          {t("home", lang)}
         </Link>
         <span className="mx-2">/</span>
-        <Link href="/directory" className="hover:text-foreground">
-          Directory
+        <Link href={localePath("/directory", lang)} className="hover:text-foreground">
+          {t("directory", lang)}
         </Link>
         <span className="mx-2">/</span>
         <span className="text-foreground">{regionLabel}</span>
@@ -57,8 +56,7 @@ export default async function RegionPage({ params }: Props) {
 
       <h1 className="mb-2 text-2xl font-semibold tracking-tight">{regionLabel}</h1>
       <p className="mb-8 text-muted-foreground">
-        {places.length} place{places.length !== 1 ? "s" : ""} found in this
-        region.
+        {t("places_found", lang).replace("{count}", String(places.length))}
       </p>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -68,7 +66,7 @@ export default async function RegionPage({ params }: Props) {
           return (
             <Link
               key={place.id}
-              href={`/place/${place.slug}`}
+              href={localePath(`/place/${place.slug}`, lang)}
               className="group flex items-start gap-3 rounded-lg border border-border p-4 transition-colors hover:bg-muted/50"
             >
               <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />

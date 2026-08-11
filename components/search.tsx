@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { Search as SearchIcon, MapPin, X } from "lucide-react";
 import type { Place } from "@/lib/types";
 import { useLanguage } from "@/lib/language-context";
+import { localePath } from "@/lib/locale";
+import { t } from "@/lib/i18n";
+import { searchPlacesClient } from "@/lib/search-client";
 
 type SearchState = "idle" | "typing" | "loading" | "results" | "no-results";
 
@@ -36,10 +39,7 @@ export function Search() {
 
     setSearchState("loading");
     try {
-      const res = await fetch(
-        `/api/search?q=${encodeURIComponent(trimmed)}&lang=${lang}`,
-      );
-      const data: Place[] = await res.json();
+      const data = await searchPlacesClient(trimmed, lang as "en" | "am");
       setResults(data);
       setSearchState(data.length > 0 ? "results" : "no-results");
     } catch {
@@ -72,7 +72,7 @@ export function Search() {
     setQuery("");
     setResults([]);
     setSearchState("idle");
-    router.push(`/place/${place.slug}`);
+    router.push(localePath(`/place/${place.slug}`, lang));
   }
 
   function clearQuery() {
@@ -123,7 +123,7 @@ export function Search() {
         <input
           ref={inputRef}
           type="text"
-          placeholder="Search places, cities, or postal codes..."
+          placeholder={t("search_placeholder", lang)}
           value={query}
           onChange={(e) => {
             const value = e.target.value;
@@ -195,7 +195,7 @@ export function Search() {
                 </div>
               ))}
               <p className="px-3 pb-2 text-center text-xs text-muted-foreground">
-                Searching...
+                {t("loading", lang)}
               </p>
             </div>
           )}
@@ -245,7 +245,7 @@ export function Search() {
           {searchState === "no-results" && (
             <div className="px-4 py-5">
               <p className="font-medium text-foreground">
-                No results found for &ldquo;{query.trim()}&rdquo;
+                {t("noResults", lang)} for &ldquo;{query.trim()}&rdquo;
               </p>
               <p className="mt-1.5 text-sm text-muted-foreground">
                 This location may exist, but we currently don&apos;t have a

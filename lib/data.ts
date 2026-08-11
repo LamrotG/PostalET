@@ -1,4 +1,5 @@
-import { supabase } from "@/lib/supabase";
+import fs from "fs";
+import path from "path";
 import type {
   Place,
   PlaceWithClaims,
@@ -14,60 +15,52 @@ export async function searchPlaces(
 ): Promise<Place[]> {
   const trimmed = query.trim().toLowerCase();
   if (!trimmed) return [];
+  const jsonPath = getLocaleDataPath(lang);
+  if (!fs.existsSync(jsonPath)) return [];
+  const raw = fs.readFileSync(jsonPath, "utf8");
+  const places: Place[] = JSON.parse(raw);
 
-  const isPostalCode = /^\d+$/.test(trimmed);
-
-  if (isPostalCode) {
-    const { data: claims } = await supabase
-      .from("postal_code_claims")
-      .select("place_id")
-      .ilike("postal_code", `${trimmed}%`);
-
-    if (!claims || claims.length === 0) return [];
-
-    const placeIds = [...new Set(claims.map((c) => c.place_id))];
-    const { data: places } = await supabase
-      .from("places")
-      .select("*")
-      .in("id", placeIds)
-      .order("name")
-      .limit(20);
-
-    return places ?? [];
+  const isPostal = /^\d+$/.test(trimmed);
+  if (isPostal) {
+    const matches: Place[] = [];
+    for (const p of places) {
+      for (const c of (p as PlaceWithClaims).postal_code_claims ?? []) {
+        if (c.postal_code && String(c.postal_code).startsWith(trimmed)) {
+          matches.push(p);
+          break;
+        }
+      }
+      if (matches.length >= 20) break;
+    }
+    return matches;
   }
 
   const searchColumn = lang === "am" ? "search_text_am" : "search_text";
-  const { data } = await supabase
-    .from("places")
-    .select("*")
-    .ilike(searchColumn, `%${trimmed}%`)
-    .order("name")
-    .limit(20);
-
-  return data ?? [];
+  const results: Place[] = [];
+  for (const p of places) {
+    const v = (searchColumn === "search_text_am" ? p.search_text_am : p.search_text) ?? p.search_text ?? p.name ?? "";
+    if (v && String(v).toLowerCase().includes(trimmed)) {
+      results.push(p);
+    }
+    if (results.length >= 20) break;
+  }
+  return results;
 }
 
 export async function getPlaceBySlug(
   slug: string,
+  lang: "en" | "am" = "en",
 ): Promise<PlaceWithClaims | null> {
-  const { data: place } = await supabase
-    .from("places")
-    .select("*")
-    .eq("slug", slug)
-    .single();
-
-  if (!place) return null;
-
-  const { data: claims } = await supabase
-    .from("postal_code_claims")
-    .select("*")
-    .eq("place_id", place.id)
-    .order("source_tier");
-
-  return {
-    ...place,
-    postal_code_claims: claims ?? [],
-  };
+  try {
+    const jsonPath = getLocaleDataPath(lang);
+    if (!fs.existsSync(jsonPath)) return null;
+    const raw = fs.readFileSync(jsonPath, "utf8");
+    const places: PlaceWithClaims[] = JSON.parse(raw);
+    const found = places.find((p) => p.slug === slug);
+    return found ?? null;
+  } catch {
+    return null;
+  }
 }
 
 const POPULAR_PLACE_NAMES = [
@@ -87,95 +80,64 @@ const POPULAR_PLACE_NAMES = [
   "Adwa",
 ];
 
-export async function getPopularPlaces(): Promise<PlaceWithClaims[]> {
-  const { data: places } = await supabase
-    .from("places")
-    .select("*")
-    .in("name", POPULAR_PLACE_NAMES)
-    .order("name")
-    .limit(14);
-
-  if (!places || places.length === 0) return [];
-
-  const placeIds = places.map((p) => p.id);
-  const { data: claims } = await supabase
-    .from("postal_code_claims")
-    .select("*")
-    .in("place_id", placeIds)
-    .order("source_tier");
-
-  const claimsByPlace = new Map<string, PostalCodeClaim[]>();
-  for (const claim of claims ?? []) {
-    const list = claimsByPlace.get(claim.place_id) ?? [];
-    list.push(claim);
-    claimsByPlace.set(claim.place_id, list);
+export async function getPopularPlaces(lang: "en" | "am" = "en"): Promise<PlaceWithClaims[]> {
+  try {
+    const jsonPath = getLocaleDataPath(lang);
+    if (!fs.existsSync(jsonPath)) return [];
+    const raw = fs.readFileSync(jsonPath, "utf8");
+    const places: PlaceWithClaims[] = JSON.parse(raw);
+    const filtered = places.filter((p) => POPULAR_PLACE_NAMES.includes(p.name));
+    return filtered.slice(0, 14);
+  } catch {
+    return [];
   }
-
-  return places.map((place) => ({
-    ...place,
-    postal_code_claims: claimsByPlace.get(place.id) ?? [],
-  }));
 }
 
 export async function getPlacesByRegion(
   region: string,
+  lang: "en" | "am" = "en",
 ): Promise<PlaceWithClaims[]> {
-  const { data: places } = await supabase
-    .from("places")
-    .select("*")
-    .eq("region", region)
-    .order("name");
-
-  if (!places || places.length === 0) return [];
-
-  const placeIds = places.map((p) => p.id);
-  const { data: claims } = await supabase
-    .from("postal_code_claims")
-    .select("*")
-    .in("place_id", placeIds)
-    .order("source_tier");
-
-  const claimsByPlace = new Map<string, PostalCodeClaim[]>();
-  for (const claim of claims ?? []) {
-    const list = claimsByPlace.get(claim.place_id) ?? [];
-    list.push(claim);
-    claimsByPlace.set(claim.place_id, list);
+  try {
+    const jsonPath = getLocaleDataPath(lang);
+    if (!fs.existsSync(jsonPath)) return [];
+    const raw = fs.readFileSync(jsonPath, "utf8");
+    const places: PlaceWithClaims[] = JSON.parse(raw);
+    return places.filter((p) => p.region === region);
+  } catch {
+    return [];
   }
-
-  return places.map((place) => ({
-    ...place,
-    postal_code_claims: claimsByPlace.get(place.id) ?? [],
-  }));
 }
 
-export async function getRegions(): Promise<RegionInfo[]> {
-  const { data } = await supabase
-    .from("places")
-    .select("region, region_am")
-    .order("region");
-
-  if (!data) return [];
-
-  const seen = new Map<string, RegionInfo>();
-  for (const row of data) {
-    if (!seen.has(row.region)) {
-      seen.set(row.region, { region: row.region, region_am: row.region_am });
+export async function getRegions(lang: "en" | "am" = "en"): Promise<RegionInfo[]> {
+  try {
+    const jsonPath = getLocaleDataPath(lang);
+    if (!fs.existsSync(jsonPath)) return [];
+    const raw = fs.readFileSync(jsonPath, "utf8");
+    const places: Place[] = JSON.parse(raw);
+    const seen = new Map();
+    for (const p of places) {
+      if (!seen.has(p.region)) seen.set(p.region, { region: p.region, region_am: null });
     }
+    return [...seen.values()];
+  } catch {
+    return [];
   }
-
-  return [...seen.values()];
 }
 
-export async function getRelatedPlaces(place: Place): Promise<Place[]> {
-  const { data } = await supabase
-    .from("places")
-    .select("*")
-    .eq("region", place.region)
-    .neq("id", place.id)
-    .order("name")
-    .limit(6);
+export async function getRelatedPlaces(place: Place, lang: "en" | "am" = "en"): Promise<Place[]> {
+  try {
+    const jsonPath = getLocaleDataPath(lang);
+    if (!fs.existsSync(jsonPath)) return [];
+    const raw = fs.readFileSync(jsonPath, "utf8");
+    const places: Place[] = JSON.parse(raw);
+    return places.filter((p) => p.region === place.region && p.id !== place.id).slice(0, 6);
+  } catch {
+    return [];
+  }
+}
 
-  return data ?? [];
+function getLocaleDataPath(lang: "en" | "am"): string {
+  return path.join(process.cwd(), "public", "data", `${lang}.json`);
 }
 
 export function resolvePostalCode(

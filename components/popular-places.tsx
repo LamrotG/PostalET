@@ -6,6 +6,8 @@ import { resolvePostalCode } from "@/lib/data";
 import type { PlaceWithClaims } from "@/lib/types";
 import type { Language } from "@/lib/language-context";
 import { localizePlace } from "@/lib/localize";
+import { localePath } from "@/lib/locale";
+import { t } from "@/lib/i18n";
 
 export function PopularPlaces({
   places,
@@ -18,7 +20,7 @@ export function PopularPlaces({
 
   return (
     <section>
-      <h2 className="mb-4 text-lg font-semibold">Popular Places</h2>
+      <h2 className="mb-4 text-lg font-semibold">{t("popular_places", lang)}</h2>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {places.map((place) => {
           const localized = localizePlace(place, lang);
@@ -26,7 +28,7 @@ export function PopularPlaces({
           return (
             <Link
               key={place.id}
-              href={`/place/${place.slug}`}
+              href={localePath(`/place/${place.slug}`, lang)}
               className="group flex items-start gap-3 rounded-lg border border-border p-4 transition-colors hover:bg-muted/50"
             >
               <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />

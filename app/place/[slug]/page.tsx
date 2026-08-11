@@ -14,15 +14,17 @@ import {
 } from "@/lib/data";
 import { getServerLanguage } from "@/lib/language-server";
 import { localizePlace } from "@/lib/localize";
+import { localePath } from "@/lib/locale";
 import type { ConfidenceLevel } from "@/lib/types";
 
 type Props = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; lang?: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const place = await getPlaceBySlug(slug);
+  const { slug, lang: langParam } = await params;
+  const lang = await getServerLanguage(langParam);
+  const place = await getPlaceBySlug(slug, lang);
 
   if (!place) {
     return { title: "Place Not Found" };
@@ -47,16 +49,14 @@ const confidenceColor: Record<ConfidenceLevel, string> = {
 };
 
 export default async function PlacePage({ params }: Props) {
-  const { slug } = await params;
-  const place = await getPlaceBySlug(slug);
+  const { slug, lang: langParam } = await params;
+  const lang = await getServerLanguage(langParam);
+  const place = await getPlaceBySlug(slug, lang);
 
   if (!place) notFound();
 
   const resolved = resolvePostalCode(place.postal_code_claims);
-  const [relatedPlaces, lang] = await Promise.all([
-    getRelatedPlaces(place),
-    getServerLanguage(),
-  ]);
+  const relatedPlaces = await getRelatedPlaces(place, lang);
   const localized = localizePlace(place, lang);
 
   const BASE_URL = "https://postal-et.vercel.app";
@@ -69,19 +69,19 @@ export default async function PlacePage({ params }: Props) {
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: BASE_URL,
+        item: `${BASE_URL}${localePath("/", lang)}`,
       },
       {
         "@type": "ListItem",
         position: 2,
         name: place.region,
-        item: `${BASE_URL}/directory/${encodeURIComponent(place.region)}`,
+        item: `${BASE_URL}${localePath(`/directory/${encodeURIComponent(place.region)}`, lang)}`,
       },
       {
         "@type": "ListItem",
         position: 3,
         name: place.name,
-        item: `${BASE_URL}/place/${place.slug}`,
+        item: `${BASE_URL}${localePath(`/place/${place.slug}`, lang)}`,
       },
     ],
   };
@@ -109,12 +109,12 @@ export default async function PlacePage({ params }: Props) {
     <div className="mx-auto w-full max-w-3xl px-4 py-10">
       {/* Breadcrumb */}
       <nav aria-label="Breadcrumb" className="mb-6 text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-foreground">
+        <Link href={localePath("/", lang)} className="hover:text-foreground">
           Home
         </Link>
         <span className="mx-2">/</span>
         <Link
-          href={`/directory/${encodeURIComponent(place.region)}`}
+          href={localePath(`/directory/${encodeURIComponent(place.region)}`, lang)}
           className="hover:text-foreground"
         >
           {localized.region}
