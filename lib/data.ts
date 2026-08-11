@@ -63,21 +63,12 @@ export async function getPlaceBySlug(
   }
 }
 
-const POPULAR_PLACE_NAMES = [
-  "Addis Ababa",
-  "Dire Dawa",
-  "Mekelle",
-  "Adama",
-  "Gondar",
-  "Hawassa",
-  "Bahir Dar",
-  "Jimma",
-  "Dessie",
-  "Harar",
-  "Debre Birhan",
-  "Shashamane",
-  "Adigrat",
-  "Adwa",
+const POPULAR_PLACE_SLUGS = [
+  "addis-ababa-addis-ababa-zone-1-addis-ababa",
+  "dire-dawa-dire-dawa-dire-dawa",
+  "bahir-dar-mirab-gojam-amhara",
+  "harar-harari-harari",
+  "adigrat-misrakawi-tigray",
 ];
 
 export async function getPopularPlaces(lang: "en" | "am" = "en"): Promise<PlaceWithClaims[]> {
@@ -86,8 +77,11 @@ export async function getPopularPlaces(lang: "en" | "am" = "en"): Promise<PlaceW
     if (!fs.existsSync(jsonPath)) return [];
     const raw = fs.readFileSync(jsonPath, "utf8");
     const places: PlaceWithClaims[] = JSON.parse(raw);
-    const filtered = places.filter((p) => POPULAR_PLACE_NAMES.includes(p.name));
-    return filtered.slice(0, 14);
+    const bySlug = new Map(places.map((place) => [place.slug, place]));
+    return POPULAR_PLACE_SLUGS.flatMap((slug) => {
+      const place = bySlug.get(slug);
+      return place ? [place] : [];
+    });
   } catch {
     return [];
   }
