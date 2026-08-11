@@ -1,5 +1,5 @@
 {
-  "search_placeholder": "ቦታዎችን ወይም ፖስታል ኮዶችን ፈልግ",
+  "search_placeholder": "ቦታዎችን ወይም ፖስታል ኮዶችን ፈልግ...",
   "search": "ፈልግ",
   "postalCode": "ፖስታል ኮድ",
   "region": "ክልል",
@@ -14,8 +14,8 @@
   "sources": "ምንጮች",
   "copy": "ቅዳ",
   "copy_success": "ወደ ክሊፕቦርድ ተቀምጧል",
-  "loading": "በመጫን...",
-  "home_title": "የኢትዮጵያ ፖስታ ኮዶችን ያግኙ",
+  "loading": "በመፈለግ ላይ...",
+  "home_title": "የኢትዮጵያ ፖስታል ኮዶችን ያግኙ",
   "home_description": "በቦታ ስም፣ ከተማ፣ ዞን፣ ክልል ወይም በፖስታ ኮድ ይፈልጉ። እያንዳንዱ ውጤት መረጃው ከየት እንደመጣ ያሳያል።",
   "directory_title": "በክልል ይመልከቱ",
   "directory_description": "የኢትዮጵያ ፖስታ ኮዶችን በክልል ይመልከቱ።",
